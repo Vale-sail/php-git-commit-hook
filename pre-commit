@@ -1,0 +1,27 @@
+  #!/bin/bash
+  pwd
+  commitFiles=`git diff --cached --name-only`
+ 
+  phpFiles="";
+ 
+  phpFilesCount=0;
+ 
+  [ -f .gitignore ] && ignoreFile="`tr '\n' ',' < .gitignore |sed 's/,$//g'`"
+ 
+  for f in $commitFiles; do
+      if [[ ! -e $f ]]; then
+          continue;
+      fi
+      if [[ $f == *.php ]]; then
+          phpFilesCount=$((phpFilesCount+1))
+          phpFiles="$phpFiles $f"
+      fi
+  done;
+ 
+  for file in $phpFiles; do
+      d=`eval php -l $file`
+      if [[ $d =~ 'Errors' ]]; then
+          exit 1;
+      fi
+  done;
+
